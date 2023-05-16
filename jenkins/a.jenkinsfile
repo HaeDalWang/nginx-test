@@ -3,17 +3,19 @@ pipeline {
 	    label "jenkins-agent-podman"
 	} 
     environment {
-    commitId = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        commitId = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     }
     stages { 
-        stage ('Buied') { 
+        stage ('checkout') { 
             steps { 
                 checkout scm
             }
+        }
+        stage ('echo'){
             steps {
                 sh "echo 'Commit ID: ${commitId}'"
                 //podman build -t nginx-test:${commitId} .
             }
         }
     }
-    } 
+}
