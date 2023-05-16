@@ -14,7 +14,7 @@ pipeline {
         stage ('build'){
             steps {
                 //sh "echo 'Commit ID: ${commitId}'"
-                sh "podman build -t nginx-test:${commitId} ."
+                sh 'podman build -t nginx-test:${commitId} .'
             }
         }
     }
