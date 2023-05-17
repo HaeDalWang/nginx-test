@@ -11,7 +11,7 @@ pipeline {
         HARBOR_NAMESPACE = 'apps'
         // docker image name
         APP_NAME = 'nginx-test'
-        // ‘robot-test’ is the credential ID you created on the KubeSphere console
+        // robot_kubelet token
         HARBOR_CREDENTIAL = credentials('harbor-credentail')
     }
 
@@ -36,6 +36,7 @@ pipeline {
         stage ('push'){
             steps {
                 container('podman'){
+                    sh 'echo ${HARBOR_CREDENTIAL}'
                     sh 'podman login $REGISTRY -u robot_kubelet --password ${HARBOR_CREDENTIAL} --tls-verify=false'
                     sh 'podman push $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:$COMMITID'
                 }
