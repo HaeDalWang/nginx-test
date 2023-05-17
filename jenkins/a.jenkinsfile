@@ -11,14 +11,14 @@ pipeline {
                 checkout scm
             }
         }
-        stage ('build'){
-            steps {
-                //sh "echo 'Commit ID: ${commitId}'"
-                sh """
-                echo test
-                podman build -t nginx-test:${commitId} .
-                """
-            }
-        }
+        // stage ('build'){
+        //     steps {
+        //         //sh "echo 'Commit ID: ${commitId}'"
+        //         sh """
+        //         echo test
+        //         podman build -t nginx-test:${commitId} .
+        //         """
+        //     }
+        // }
     }
 }
