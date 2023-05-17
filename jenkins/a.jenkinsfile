@@ -36,7 +36,7 @@ pipeline {
         stage ('push'){
             steps {
                 container('podman'){
-                    sh '''echo ${HARBOR_CREDENTIAL} | podman login $REGISTRY -u 'robot_kubelet' --password-stdin --tls-verify=false'''
+                    sh 'podman login $REGISTRY -u robot_kubelet --password ${HARBOR_CREDENTIAL} --tls-verify=false'
                     sh 'podman push $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:$COMMITID'
                 }
             }
