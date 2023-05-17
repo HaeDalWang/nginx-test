@@ -1,15 +1,24 @@
 pipeline { 
-    // 라벨은 kubernetes 플러그인 podTemplate의 라벨 여러개의 컨테이너를 정의 가능
+    // 라벨은 kubernetes 플러그인 podTemplate의 라벨
     agent { node { label 'jenkins-agent-podman'} } 
     // 환경변수
     environment {
-        commitId = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        // github Commit ID
+        COMMITID = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        // Harbor Domain
+        REGISTRY = 'harbor-registry.harbor.svc.cluster.local:5000'
+        // the project name
+        HARBOR_NAMESPACE = 'apps'
+        // docker image name
+        APP_NAME = 'nginx-test'
+        // ‘robot-test’ is the credential ID you created on the KubeSphere console
+        HARBOR_CREDENTIAL = credentials('harbor-credentail')
     }
 
     stages { 
         stage ('checkout') { 
             steps {
-                // Podtemplate안 어떠한 컨테이너를 사용하여 작업할지 명시
+                // Podtemplate중 컨테이너 항목을 선택
                 container('podman'){
                     checkout scm
                 }
@@ -18,10 +27,17 @@ pipeline {
         stage ('build'){
             steps {
                 container('podman'){
-                    //sh "echo 'Commit ID: ${commitId}'"
-                    sh """
-                    podman build -t nginx-test:${commitId} .
-                    """
+                    //sh "echo 'Commit ID: ${COMMITID}'"
+                    sh 'podman build -t $APP_NAME:$COMMITID .'
+
+                }
+            }
+        }
+        stage ('push'){
+            steps {
+                container('podman'){
+                    sh '''echo $HARBOR_CREDENTIAL_PSW | podman login $REGISTRY -u 'robot$robot_kubelet' --password-stdin'''
+                    sh 'podman push $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:$COMMITID'
                 }
             }
         }
